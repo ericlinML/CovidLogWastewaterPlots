@@ -44,6 +44,7 @@ def plot_linear_covid(county):
 df = pd.read_csv('../wastewater_by_county.csv')
 last_upload_date = pd.read_csv('last_upload_date.csv')
 
+# Hard coded to check against the last update for Suffolk County (Boston)
 last_date = last_upload_date.iloc[-1, 0]
 last_update = df[df['name'] == 'Suffolk County, MA']['sampling_week'].to_list()[-1]
 
@@ -76,7 +77,7 @@ if last_date != last_update:
         refresh_token=creds['refresh_token']
         )
 
-    subr = 'test'
+    subr = 'CoronavirusMa'
     subreddit = reddit.subreddit(subr)
     title = 'COVID-19 Wastewater Log & Linear Plots for Boston and Cambridge, MA'
     images = [
@@ -99,9 +100,6 @@ if last_date != last_update:
     ]
     subreddit.submit_gallery(title, images)
 
-else:
-    print('No new updates')
-
     # Setting up to send email
     port = 465
     context = ssl.create_default_context()
@@ -112,4 +110,8 @@ else:
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         server.login(sender, creds[emaail_password])
         server.sendmail(sender, receiver, email)
+
+
+else:
+    print('No new updates')
 
