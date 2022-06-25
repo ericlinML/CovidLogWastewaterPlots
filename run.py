@@ -48,7 +48,7 @@ last_upload_date = pd.read_csv('last_upload_date.csv')
 last_date = last_upload_date.iloc[-1, 0]
 last_update = df[df['name'] == 'Suffolk County, MA']['sampling_week'].to_list()[-1]
 
-if last_date != last_update:
+if last_date == last_update:
     suffolk = plot_log_covid('Suffolk County, MA')
     suffolk.save(f'figures/suffolk_log_{last_update}.png', dpi=300)
     suffolk_linear = plot_linear_covid('Suffolk County, MA')
@@ -98,17 +98,17 @@ if last_date != last_update:
             'caption': f'Middlesex County Linear Plot testing'
         },
     ]
-    subreddit.submit_gallery(title, images)
+    subreddit.submit_gallery(title, images, flair_id='1d8891e0-80e4-11ea-8ad7-0e20863e7c8d')
 
     # Setting up to send email
     port = 465
     context = ssl.create_default_context()
-    sender = creds[sender_email]
-    receiver = creds[receiver_email]
+    sender = creds['sender_email']
+    receiver = creds['receiver_email']
     email = f"Subject: COVID Wastewater plots today \n\n There are new plots saved under projects/covidLogPlot/figures "
 
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
-        server.login(sender, creds[emaail_password])
+        server.login(sender, creds['email_password'])
         server.sendmail(sender, receiver, email)
 
 
