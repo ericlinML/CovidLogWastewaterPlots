@@ -112,5 +112,4 @@ else:
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         server.login(sender, creds[emaail_password])
         server.sendmail(sender, receiver, email)
-"""
 
