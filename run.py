@@ -41,7 +41,7 @@ def plot_linear_covid(county):
     return(temp_plot)
 
 
-df = pd.read_csv('../wastewater_by_county.csv')
+df = pd.read_csv('~/projects/covid/wastewater_by_county.csv')
 last_upload_date = pd.read_csv('last_upload_date.csv')
 
 # Hard coded to check against the last update for Suffolk County (Boston)
@@ -50,14 +50,14 @@ last_update = df[df['name'] == 'Suffolk County, MA']['sampling_week'].to_list()[
 
 if last_date != last_update:
     suffolk = plot_log_covid('Suffolk County, MA')
-    suffolk.save(f'../figures/suffolk_log_{last_update}.png', dpi=300)
+    suffolk.save(f'figures/suffolk_log_{last_update}.png', dpi=300)
     suffolk_linear = plot_linear_covid('Suffolk County, MA')
-    suffolk_linear.save(f'../figures/suffolk_linear_{last_update}.png', dpi=300)
+    suffolk_linear.save(f'figures/suffolk_linear_{last_update}.png', dpi=300)
 
     middlesex = plot_log_covid('Middlesex County, MA')
-    middlesex.save(f'../figures/middlesex_log_{last_update}.png', dpi=300)
+    middlesex.save(f'figures/middlesex_log_{last_update}.png', dpi=300)
     middlesex_linear = plot_linear_covid('Middlesex County, MA')
-    middlesex_linear.save(f'../figures/middlesex_linear_{last_update}.png', dpi=300)
+    middlesex_linear.save(f'figures/middlesex_linear_{last_update}.png', dpi=300)
 
     last_upload_date.loc[len(last_upload_date.index), 'date'] = last_update
     last_upload_date.to_csv('last_upload_date.csv', index=False)
@@ -82,19 +82,19 @@ if last_date != last_update:
     title = 'COVID-19 Wastewater Log & Linear Plots for Boston and Cambridge, MA'
     images = [
         {
-            'image_path': f'../figures/suffolk_log_{last_update}.png',
+            'image_path': f'figures/suffolk_log_{last_update}.png',
             'caption': f'Suffolk County Log Plot'
         },
         {
-            'image_path': f'../figures/suffolk_linear_{last_update}.png',
+            'image_path': f'figures/suffolk_linear_{last_update}.png',
             'caption': f'Suffolk County Linear Plot testing'
         },
         {
-            'image_path': f'../figures/middlesex_log_{last_update}.png',
+            'image_path': f'figures/middlesex_log_{last_update}.png',
             'caption': f'Middlesex County Log Plot testing'
         },
         {
-            'image_path': f'../figures/middlesex_linear_{last_update}.png',
+            'image_path': f'figures/middlesex_linear_{last_update}.png',
             'caption': f'Middlesex County Linear Plot testing'
         },
     ]
@@ -105,7 +105,7 @@ if last_date != last_update:
     context = ssl.create_default_context()
     sender = creds[sender_email]
     receiver = creds[receiver_email]
-    email = f"Subject: COVID Wastewater plots today \n\n There are new plots saved under projects/covid/figures "
+    email = f"Subject: COVID Wastewater plots today \n\n There are new plots saved under projects/covidLogPlot/figures "
 
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         server.login(sender, creds[emaail_password])
