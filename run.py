@@ -79,7 +79,7 @@ if last_date == last_update:
 
     subr = 'CoronavirusMa'
     subreddit = reddit.subreddit(subr)
-    title = 'COVID-19 Wastewater Log & Linear Plots for Boston and Cambridge, MA'
+    title = 'COVID-19 Wastewater Log & Linear Plots for Boston and Cambridge, MA using Biobot data'
     images = [
         {
             'image_path': f'figures/suffolk_log_{last_update}.png',
