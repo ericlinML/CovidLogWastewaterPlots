@@ -3,7 +3,7 @@ import pandas as pd
 
 import datetime as dt
 import plotnine as p9
-from plotnine import ggplot, geom_point, aes, geom_line
+from plotnine import ggplot, geom_point, aes, geom_line, element_text
 from mizani.breaks import date_breaks
 from mizani.formatters import date_format
 
@@ -20,8 +20,12 @@ def plot_log_covid(county):
      + geom_line()
      + p9.scale_x_datetime(breaks=date_breaks('1 month'), labels=date_format('%D'), name='Date')
      + p9.scale_y_log10(name = 'Rolling average COVID concentration in wastewater')
-     + p9.theme(figure_size=(24,12))
      + p9.ggtitle(f'Log Scale {county} COVID Wastewater Data up to {temp_df.sampling_week.to_list()[-1]}')
+     + p9.theme(
+         figure_size=(24,12),
+         axis_title=element_text(size=14),
+         plot_title=element_text(size=18),
+         )
     )
     
     return(temp_plot)
@@ -34,8 +38,12 @@ def plot_linear_covid(county):
      + geom_line()
      + p9.scale_x_datetime(breaks=date_breaks('1 month'), labels=date_format('%D'), name='Date')
      + p9.labels.ylab('Rolling average COVID concentration in wastewater')
-     + p9.theme(figure_size=(24,12))
      + p9.ggtitle(f'Linear Scale {county} COVID Wastewater Data up to {temp_df.sampling_week.to_list()[-1]}')
+     + p9.theme(
+         figure_size=(24,12),
+         axis_title=element_text(size=14),
+         plot_title=element_text(size=18),
+         )
     )
     
     return(temp_plot)
