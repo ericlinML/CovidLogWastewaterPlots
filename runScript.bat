@@ -1,3 +1,4 @@
 cd C:\Users\takee\projects\covid\
 git pull
-C:\Users\takee\Anaconda3\envs\covid\python.exe C:\Users\takee\projects\covid\myCode\run.py
+cd C:\Users\takee\projects\covidLogPlot\
+C:\Users\takee\Anaconda3\envs\covid\python.exe C:\Users\takee\projects\covidLogPlot\run.py

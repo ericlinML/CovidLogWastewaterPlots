@@ -50,13 +50,13 @@ def plot_linear_covid(county):
 
 
 df = pd.read_csv('~/projects/covid/wastewater_by_county.csv')
-last_upload_date = pd.read_csv('last_upload_date.csv')
+last_upload_date = pd.read_csv('~/projects/covidLogPlot/last_upload_date.csv')
 
 # Hard coded to check against the last update for Suffolk County (Boston)
 last_date = last_upload_date.iloc[-1, 0]
 last_update = df[df['name'] == 'Suffolk County, MA']['sampling_week'].to_list()[-1]
 
-if last_date == last_update:
+if last_date != last_update:
     suffolk = plot_log_covid('Suffolk County, MA')
     suffolk.save(f'figures/suffolk_log_{last_update}.png', dpi=300)
     suffolk_linear = plot_linear_covid('Suffolk County, MA')
