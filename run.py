@@ -7,10 +7,13 @@ from plotnine import ggplot, geom_point, aes, geom_line, element_text
 from mizani.breaks import date_breaks
 from mizani.formatters import date_format
 
+import os
+import shutil
 import smtplib, ssl
 import json
 import praw
 import requests
+import tweepy
 
 def plot_log_covid(county):
     temp_df = df[df['name']==county]
@@ -25,6 +28,7 @@ def plot_log_covid(county):
          figure_size=(24,12),
          axis_title=element_text(size=14),
          plot_title=element_text(size=18),
+         axis_text_x=element_text(size=7)
          )
     )
     
@@ -43,6 +47,7 @@ def plot_linear_covid(county):
          figure_size=(24,12),
          axis_title=element_text(size=14),
          plot_title=element_text(size=18),
+         axis_text_x=element_text(size=7)
          )
     )
     
@@ -57,16 +62,43 @@ last_date = last_upload_date.iloc[-1, 0]
 last_update = df[df['name'] == 'Suffolk County, MA']['sampling_week'].to_list()[-1]
 
 if last_date != last_update:
-    suffolk = plot_log_covid('Suffolk County, MA')
-    suffolk.save(f'figures/suffolk_log_{last_update}.png', dpi=300)
-    suffolk_linear = plot_linear_covid('Suffolk County, MA')
-    suffolk_linear.save(f'figures/suffolk_linear_{last_update}.png', dpi=300)
+#if last_date == last_update: # for testing 
 
-    middlesex = plot_log_covid('Middlesex County, MA')
-    middlesex.save(f'figures/middlesex_log_{last_update}.png', dpi=300)
-    middlesex_linear = plot_linear_covid('Middlesex County, MA')
-    middlesex_linear.save(f'figures/middlesex_linear_{last_update}.png', dpi=300)
+    # clear old images
+    try: 
+        shutil.rmtree('figures')
+        os.mkdir('figures')
+    except:
+        print('No figures folder')
 
+    ma_counties = [
+        'Suffolk County, MA',
+        'Essex County, MA',
+        'Hampshire County, MA',
+        'Middlesex County, MA',
+        'Worcester County, MA',
+        'Plymouth County, MA',
+        'Barnstable County, MA',
+        'Bristol County, MA',
+        'Hampden County, MA'
+        ]
+            
+    df[df['state']=='MA'].name.value_counts().index.to_list()
+    county_data = {}
+
+    for county in ma_counties:
+        county_name = county.split()[0].lower()
+        print(county_name)
+        log_save_string = f"figures/{county_name}_log_{last_update}.jpg"
+        linear_save_string = f"figures/{county_name}_linear_{last_update}.jpg"
+        
+        logPlot = plot_log_covid(county)
+        logPlot.save(log_save_string, dpi=300)
+        linearPlot = plot_linear_covid(county)
+        linearPlot.save(linear_save_string, dpi=300)
+
+        county_data[county] = {'log': log_save_string, 'linear':linear_save_string}
+    
     last_upload_date.loc[len(last_upload_date.index), 'date'] = last_update
     last_upload_date.to_csv('last_upload_date.csv', index=False)
 
@@ -86,27 +118,16 @@ if last_date != last_update:
         )
 
     subr = 'CoronavirusMa'
+#    subr = 'test'
     subreddit = reddit.subreddit(subr)
-    title = 'COVID-19 Wastewater Log & Linear Plots for Boston and Cambridge, MA using Biobot data'
-    images = [
-        {
-            'image_path': f'figures/suffolk_log_{last_update}.png',
-            'caption': f'Suffolk County Log Plot'
-        },
-        {
-            'image_path': f'figures/suffolk_linear_{last_update}.png',
-            'caption': f'Suffolk County Linear Plot testing'
-        },
-        {
-            'image_path': f'figures/middlesex_log_{last_update}.png',
-            'caption': f'Middlesex County Log Plot testing'
-        },
-        {
-            'image_path': f'figures/middlesex_linear_{last_update}.png',
-            'caption': f'Middlesex County Linear Plot testing'
-        },
-    ]
+    title = 'COVID-19 Wastewater Log & Linear Plots for MA Counties using Biobot data'
+    images = []
+    for county in ma_counties:
+        images.append({'image_path': county_data[county]['log'], 'caption': f'{county.split()[0]} County Log Plot'})
+        images.append({'image_path': county_data[county]['linear'], 'caption': f'{county.split()[0]} County Linear Plot'})
+
     subreddit.submit_gallery(title, images, flair_id='1d8891e0-80e4-11ea-8ad7-0e20863e7c8d')
+#    subreddit.submit_gallery(title, images,)
 
     # Setting up to send email
     port = 465
@@ -119,7 +140,32 @@ if last_date != last_update:
         server.login(sender, creds['email_password'])
         server.sendmail(sender, receiver, email)
 
+    # Post to twitter via v1 API since v2 doesn't support images    
+    auth = tweepy.OAuthHandler(creds['twitter_api_key'], creds['twitter_api_secret'])
+    auth.set_access_token(creds['twitter_access_token'], creds['twitter_access_secret'])
+    
+    api = tweepy.API(auth, wait_on_rate_limit=True)
+
+    image_files = [
+        f'figures/suffolk_log_{last_update}.jpg', 
+        f'figures/suffolk_linear_{last_update}.jpg', 
+        f'figures/middlesex_log_{last_update}.jpg', 
+        f'figures/middlesex_linear_{last_update}.jpg',
+]
+    media_ids = []
+    for image_file in image_files:
+        id = api.media_upload(image_file)
+        media_ids.append(id.media_id)
+
+    tweetText = f"""
+    Updated COVID-19 Wastewater Log & Linear Plots for Suffolk and Middlesex Counties, MA using Biobot data
+
+    Data goes up to {last_update}
+
+    Source: weekly data release from https://github.com/biobotanalytics/covid19-wastewater-data
+   """
+
+    api.update_status(status=tweetText, media_ids=media_ids) 
 
 else:
     print('No new updates')
-
