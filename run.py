@@ -60,6 +60,7 @@ last_upload_date = pd.read_csv('~/projects/covidLogPlot/last_upload_date.csv')
 # Hard coded to check against the last update for Suffolk County (Boston)
 last_date = last_upload_date.iloc[-1, 0]
 last_update = df[df['name'] == 'Suffolk County, MA']['sampling_week'].to_list()[-1]
+print(last_update)
 
 if last_date != last_update:
 #if last_date == last_update: # for testing 
@@ -120,7 +121,7 @@ if last_date != last_update:
     subr = 'CoronavirusMa'
 #    subr = 'test'
     subreddit = reddit.subreddit(subr)
-    title = 'COVID-19 Wastewater Log & Linear Plots for MA Counties using Biobot data'
+    title = f'{last_update} COVID-19 Wastewater Log & Linear Plots for MA Counties using Biobot data'
     images = []
     for county in ma_counties:
         images.append({'image_path': county_data[county]['log'], 'caption': f'{county.split()[0]} County Log Plot'})
