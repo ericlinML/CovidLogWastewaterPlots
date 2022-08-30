@@ -82,8 +82,8 @@ last_date = last_upload_date.iloc[-1, 0]
 last_update = df[df['name'] == 'Suffolk County, MA']['sampling_week'].to_list()[-1]
 print(last_update)
 
-#if last_date != last_update:
-if last_date == last_update: # for testing 
+if last_date != last_update:
+# if last_date == last_update: # for testing 
 
     # clear old images
     try: 
@@ -160,8 +160,8 @@ if last_date == last_update: # for testing
         refresh_token=creds['refresh_token']
         )
 
-#    subr = 'CoronavirusMa'
-    subr = 'test'
+    subr = 'CoronavirusMa'
+#    subr = 'test'
     subreddit = reddit.subreddit(subr)
     title = f'{last_update} COVID-19 Wastewater Log & Linear Plots for MA Counties using Biobot data'
     images = [
@@ -173,8 +173,8 @@ if last_date == last_update: # for testing
         images.append({'image_path': county_data[county]['log'], 'caption': f'{county.split()[0]} County Log Plot'})
         images.append({'image_path': county_data[county]['linear'], 'caption': f'{county.split()[0]} County Linear Plot'})
 
-#    subreddit.submit_gallery(title, images, flair_id='1d8891e0-80e4-11ea-8ad7-0e20863e7c8d')
-    subreddit.submit_gallery(title, images,)
+    subreddit.submit_gallery(title, images, flair_id='1d8891e0-80e4-11ea-8ad7-0e20863e7c8d')
+#    subreddit.submit_gallery(title, images,)
 
     # Setting up to send email
     port = 465
